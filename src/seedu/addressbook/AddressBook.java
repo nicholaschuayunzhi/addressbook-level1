@@ -203,12 +203,31 @@ public class AddressBook {
         showWelcomeMessage();
         processProgramArgs(args);
         loadDataFromStorage();
+        handleUserInputs();
+    }
+
+    /*
+     * handles user input while the application is still running
+     */
+
+    private static void handleUserInputs() {
         while (true) {
-            String userCommand = getUserInput();
-            echoUserCommand(userCommand);
-            String feedback = executeCommand(userCommand);
-            showResultToUser(feedback);
+            handleUserInput();
         }
+    }
+
+    /*
+     * Requests for user input
+     * Echo User's command
+     * Executes command
+     * Responds to user with feedback
+     */
+
+    private static void handleUserInput() {
+        String userCommand = getUserInput();
+        echoUserCommand(userCommand);
+        String feedback = executeCommand(userCommand);
+        showResultToUser(feedback);
     }
 
     /*
