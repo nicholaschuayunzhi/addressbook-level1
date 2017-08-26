@@ -108,6 +108,10 @@ public class AddressBook {
     private static final String COMMAND_LIST_DESC = "Displays all persons as a list with index numbers.";
     private static final String COMMAND_LIST_EXAMPLE = COMMAND_LIST_WORD;
 
+    private static final String COMMAND_SORT_WORD = "sort";
+    private static final String COMMAND_SORT_DESC = "Sorts all persons alphabetically and lists them";
+    private static final String COMMAND_SORT_EXAMPLE = COMMAND_SORT_WORD;
+
     private static final String COMMAND_DELETE_WORD = "delete";
     private static final String COMMAND_DELETE_DESC = "Deletes a person identified by the index number used in "
             + "the last find/list call.";
@@ -387,6 +391,8 @@ public class AddressBook {
                 return executeFindPersons(commandArgs);
             case COMMAND_LIST_WORD:
                 return executeListAllPersonsInAddressBook();
+            case COMMAND_SORT_WORD:
+                return executeSortAndListAllPersonsInAddressBook();
             case COMMAND_DELETE_WORD:
                 return executeDeletePerson(commandArgs);
             case COMMAND_CLEAR_WORD:
@@ -593,6 +599,14 @@ public class AddressBook {
      */
     private static String executeListAllPersonsInAddressBook() {
         ArrayList<HashMap<PersonProperty,String>> toBeDisplayed = getAllPersonsInAddressBook();
+        showToUser(toBeDisplayed);
+        return getMessageForPersonsDisplayedSummary(toBeDisplayed);
+    }
+
+
+    private static String executeSortAndListAllPersonsInAddressBook(){
+        ArrayList<HashMap<PersonProperty,String>> toBeDisplayed = getAllPersonsInAddressBook();
+        sortPersonsByName(toBeDisplayed);
         showToUser(toBeDisplayed);
         return getMessageForPersonsDisplayedSummary(toBeDisplayed);
     }
@@ -820,10 +834,14 @@ public class AddressBook {
     }
 
     /**
-     * Returns all persons in the address book
+     * Returns a copy of all persons in the address book
      */
     private static ArrayList<HashMap<PersonProperty,String>> getAllPersonsInAddressBook() {
-        return ALL_PERSONS;
+        ArrayList<HashMap<PersonProperty,String>> allPersonsCopy = new ArrayList<>();
+        for(HashMap<PersonProperty,String> person : ALL_PERSONS){
+            allPersonsCopy.add(person);
+        }
+        return allPersonsCopy;
     }
 
     /**
@@ -1091,6 +1109,19 @@ public class AddressBook {
         return email.matches("\\S+@\\S+\\.\\S+"); // email is [non-whitespace]@[non-whitespace].[non-whitespace]
         //TODO: implement a more permissive validation
     }
+    
+    /** 
+     * Sorts collection of people by name
+     * @param persons to be sorted
+     */
+
+    private static void sortPersonsByName(ArrayList<HashMap<PersonProperty, String>> persons) {
+        Collections.sort(persons, (personA, personB) -> {
+            String personAName = getNameFromPerson(personA);
+            String personBName = getNameFromPerson(personB);
+            return personAName.compareToIgnoreCase(personBName);
+        });
+    }
 
 
     /*
@@ -1104,6 +1135,7 @@ public class AddressBook {
         return getUsageInfoForAddCommand() + LS
                 + getUsageInfoForFindCommand() + LS
                 + getUsageInfoForViewCommand() + LS
+                + getUsageInfoForSortCommand() + LS
                 + getUsageInfoForDeleteCommand() + LS
                 + getUsageInfoForClearCommand() + LS
                 + getUsageInfoForExitCommand() + LS
@@ -1141,6 +1173,12 @@ public class AddressBook {
     private static String getUsageInfoForViewCommand() {
         return String.format(MESSAGE_COMMAND_HELP, COMMAND_LIST_WORD, COMMAND_LIST_DESC) + LS
                 + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_LIST_EXAMPLE) + LS;
+    }
+
+    /** Returns the string for showing 'sort' command usage instruction */
+    private static String getUsageInfoForSortCommand() {
+        return String.format(MESSAGE_COMMAND_HELP, COMMAND_SORT_WORD, COMMAND_SORT_DESC) + LS
+                + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_SORT_EXAMPLE) + LS;
     }
 
     /** Returns string for showing 'help' command usage instruction */
