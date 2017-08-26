@@ -605,10 +605,14 @@ public class AddressBook {
 
 
     private static String executeSortAndListAllPersonsInAddressBook(){
-        ArrayList<HashMap<PersonProperty,String>> toBeDisplayed = getAllPersonsInAddressBook();
-        sortPersonsByName(toBeDisplayed);
-        showToUser(toBeDisplayed);
-        return getMessageForPersonsDisplayedSummary(toBeDisplayed);
+        ArrayList<HashMap<PersonProperty,String>> allPersons = getAllPersonsInAddressBook();
+        ArrayList<HashMap<PersonProperty,String>> allPersonsCopy = new ArrayList<>();
+        for(HashMap<PersonProperty,String> person : allPersons){
+            allPersonsCopy.add(person);
+        }
+        sortPersonsByName(allPersonsCopy);
+        showToUser(allPersonsCopy);
+        return getMessageForPersonsDisplayedSummary(allPersonsCopy);
     }
 
     /**
@@ -834,14 +838,10 @@ public class AddressBook {
     }
 
     /**
-     * Returns a copy of all persons in the address book
+     * Returns all persons in the address book
      */
     private static ArrayList<HashMap<PersonProperty,String>> getAllPersonsInAddressBook() {
-        ArrayList<HashMap<PersonProperty,String>> allPersonsCopy = new ArrayList<>();
-        for(HashMap<PersonProperty,String> person : ALL_PERSONS){
-            allPersonsCopy.add(person);
-        }
-        return allPersonsCopy;
+        return ALL_PERSONS;
     }
 
     /**
