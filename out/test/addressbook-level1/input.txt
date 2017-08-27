@@ -20,31 +20,35 @@
 
   # should catch invalid args format
   add wrong args wrong args
-  add Valid Name p/12345 valid@email.butNoPrefix
-  add Valid Name 12345 e/valid@email.butPhonePrefixMissing
+  add Valid Name p/12345 valid@email.butNoPrefix dob/11-11-1111
+  add Valid Name 12345 e/valid@email.butPhonePrefixMissing dob/11-11-1111
+  add Valid Name 12345 e/valid@email.butDobPrefixMissing 11-11-1111
   
   # should catch invalid person data
-  add []\[;] p/12345 e/valid@e.mail
-  add Valid Name p/not_numbers e/valid@e.mail
-  add Valid Name p/12345 e/notAnEmail
+  add []\[;] p/12345 e/valid@e.mail dob/11-11-1111
+  add Valid Name p/not_numbers e/valid@e.mail dob/11-11-1111
+  add Valid Name p/12345 e/notAnEmail dob/11-11-1111
+  add Valid Name p/12345 e/valid@e.mail dob/FA-KE-DATE
 
   # should add correctly
-  add Adam Brown p/111111 e/adam@gmail.com
+  add Adam Brown p/111111 e/adam@gmail.com dob/14-03-1993
   list
-  add Betsy Choo p/222222 e/benchoo@nus.edu.sg
+  add Betsy Choo p/222222 e/benchoo@nus.edu.sg dob/12-06-1996
   list
 
-  # order of phone and email should not matter
-  add Charlie Dickson e/charlie.d@nus.edu.sg p/333333
+  # order of phone email and dob should not matter
+  add Charlie Dickson e/charlie.d@nus.edu.sg p/333333 dob/12-12-1989
   list
-  add Esther Potato p/555555 e/esther@notreal.potato
+  add Esther Potato p/555555 dob/24-01-1999 e/esther@notreal.potato
+  list
+  add Fred Dee dob/01-01-1900 p/555555 e/fredNotFrodo@notreal.lotr 
   list
   
 ##########################################################
 # test sort persons command
 ##########################################################
   
-  add Dickson Ee e/dickson@nus.edu.sg p/444444
+  add Dickson Ee e/dickson@nus.edu.sg p/444444 dob/14-10-1992
   list
   sort
 
