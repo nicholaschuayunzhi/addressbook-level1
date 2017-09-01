@@ -1021,6 +1021,29 @@ public class AddressBook {
     }
 
     /**
+     * Extracts substring representing person's data from person string representation
+     *
+     * @param encoded person string representation
+     * @param DATA_PREFIX prefix of data
+     * @param indexOfDesiredData index of the start of desired data
+     * @param indexesOfData variable argument of all the indexes of the different data of person
+     * @return person's data
+     */
+    
+    private static String extractDesiredDataFromPersonString(String encoded, String DATA_PREFIX, int indexOfDesiredDataPrefix, int... indexesOfDataPrefix) {
+        int finalIndexOfSubstring = encoded.length();
+        
+        //find the index that succeeds the indexOfDesiredDataPrefix
+        for(int indexOfData : indexesOfDataPrefix){
+            if (indexOfData > indexOfDesiredDataPrefix && indexOfData < finalIndexOfSubstring) {
+                finalIndexOfSubstring = indexOfData;
+            }
+        }
+        return removePrefixSign(encoded.substring(indexOfDesiredDataPrefix, finalIndexOfSubstring).trim(), DATA_PREFIX);
+    }
+    
+    
+    /**
      * Extracts substring representing person name from person string representation
      *
      * @param encoded person string representation
@@ -1046,31 +1069,7 @@ public class AddressBook {
         final int indexOfEmailPrefix = encoded.indexOf(PERSON_DATA_PREFIX_EMAIL);
         final int indexOfDobPrefix = encoded.indexOf(PERSON_DATA_PREFIX_DOB);
 
-        //phone is last arg, target is from prefix to end of string
-        if (indexOfPhonePrefix > indexOfEmailPrefix && indexOfPhonePrefix > indexOfDobPrefix) {
-            return removePrefixSign(encoded.substring(indexOfPhonePrefix, encoded.length()).trim(),
-                    PERSON_DATA_PREFIX_PHONE);
-        //phone is middle arg, dob is last argument, target is from own prefix to dob
-        } else if(indexOfPhonePrefix > indexOfEmailPrefix){
-            return removePrefixSign(
-                    encoded.substring(indexOfPhonePrefix, indexOfDobPrefix).trim(),
-                    PERSON_DATA_PREFIX_PHONE);            //phone is middle arg, email is last argument, target is from own prefix to email
-        } else if(indexOfPhonePrefix > indexOfDobPrefix) {
-            return removePrefixSign(
-                    encoded.substring(indexOfPhonePrefix, indexOfEmailPrefix).trim(),
-                    PERSON_DATA_PREFIX_PHONE);
-            //phone is first arg
-            //dob is next argument, target is from own prefix to dob      
-        } else if(indexOfDobPrefix < indexOfEmailPrefix){
-            return removePrefixSign(
-                    encoded.substring(indexOfPhonePrefix, indexOfDobPrefix).trim(),
-                    PERSON_DATA_PREFIX_PHONE);
-            //email is next argument, target is from own prefix to phone    
-        } else {
-            return removePrefixSign(
-                    encoded.substring(indexOfPhonePrefix, indexOfEmailPrefix).trim(),
-                    PERSON_DATA_PREFIX_PHONE);
-        }
+        return extractDesiredDataFromPersonString(encoded, PERSON_DATA_PREFIX_PHONE, indexOfPhonePrefix, indexOfEmailPrefix, indexOfDobPrefix);
     }
 
     /**
@@ -1083,32 +1082,8 @@ public class AddressBook {
         final int indexOfPhonePrefix = encoded.indexOf(PERSON_DATA_PREFIX_PHONE);
         final int indexOfEmailPrefix = encoded.indexOf(PERSON_DATA_PREFIX_EMAIL);
         final int indexOfDobPrefix = encoded.indexOf(PERSON_DATA_PREFIX_DOB);
-        //email is last arg, target is from prefix to end of string
-        if (indexOfEmailPrefix > indexOfPhonePrefix && indexOfEmailPrefix > indexOfDobPrefix) {
-            return removePrefixSign(encoded.substring(indexOfEmailPrefix, encoded.length()).trim(),
-                    PERSON_DATA_PREFIX_EMAIL);
-        //email is middle arg, dob is last argument, target is from own prefix to dob  
-        } else if(indexOfEmailPrefix > indexOfPhonePrefix){
-            return removePrefixSign(
-                    encoded.substring(indexOfEmailPrefix, indexOfDobPrefix).trim(),
-                    PERSON_DATA_PREFIX_EMAIL);
-        //email is middle arg, phone is last argument, target is from own prefix to phone
-        } else if(indexOfEmailPrefix > indexOfDobPrefix) {
-            return removePrefixSign(
-                    encoded.substring(indexOfEmailPrefix, indexOfPhonePrefix).trim(),
-                    PERSON_DATA_PREFIX_EMAIL);
-            //email is first arg
-            //dob is next argument, target is from own prefix to dob      
-        } else if(indexOfDobPrefix < indexOfPhonePrefix){
-            return removePrefixSign(
-                    encoded.substring(indexOfEmailPrefix, indexOfDobPrefix).trim(),
-                    PERSON_DATA_PREFIX_EMAIL);
-            //phone is next argument, target is from own prefix to phone    
-        } else {
-            return removePrefixSign(
-                    encoded.substring(indexOfEmailPrefix, indexOfPhonePrefix).trim(),
-                    PERSON_DATA_PREFIX_EMAIL);
-        }
+
+        return extractDesiredDataFromPersonString(encoded, PERSON_DATA_PREFIX_EMAIL, indexOfEmailPrefix, indexOfPhonePrefix, indexOfDobPrefix);
     }
 
     /**
@@ -1117,39 +1092,12 @@ public class AddressBook {
      * @param encoded person string representation
      * @return date of birth argument WITHOUT prefix
      */
-    //TODO: clean/abstract logic, will make adding more data easier 
     private static String extractDobFromPersonString(String encoded){
         final int indexOfDobPrefix = encoded.indexOf(PERSON_DATA_PREFIX_DOB);
         final int indexOfPhonePrefix = encoded.indexOf(PERSON_DATA_PREFIX_PHONE);
         final int indexOfEmailPrefix = encoded.indexOf(PERSON_DATA_PREFIX_EMAIL);
-        
-        //dob is last arg, target is from prefix to end of string
-        if (indexOfDobPrefix > indexOfPhonePrefix && indexOfDobPrefix > indexOfEmailPrefix) {
-            return removePrefixSign(encoded.substring(indexOfDobPrefix, encoded.length()).trim(),
-                    PERSON_DATA_PREFIX_DOB);
-        //dob is middle arg, email is last argument, target is from own prefix to email  
-        } else if(indexOfDobPrefix > indexOfPhonePrefix){
-            return removePrefixSign(
-                    encoded.substring(indexOfDobPrefix, indexOfEmailPrefix).trim(),
-                    PERSON_DATA_PREFIX_DOB);
-        //dob is middle arg, phone is last argument, target is from own prefix to phone
-        } else if(indexOfDobPrefix > indexOfEmailPrefix) {
-            return removePrefixSign(
-                    encoded.substring(indexOfDobPrefix, indexOfPhonePrefix).trim(),
-                    PERSON_DATA_PREFIX_DOB);
-        //dob is first arg
-        //email is next argument, target is from own prefix to email      
-        } else if(indexOfEmailPrefix < indexOfPhonePrefix){
-            return removePrefixSign(
-                    encoded.substring(indexOfDobPrefix, indexOfEmailPrefix).trim(),
-                    PERSON_DATA_PREFIX_DOB);
-        //phone is next argument, target is from own prefix to phone    
-        } else {
-            return removePrefixSign(
-                    encoded.substring(indexOfDobPrefix, indexOfPhonePrefix).trim(),
-                    PERSON_DATA_PREFIX_DOB);
-        }
-      
+
+        return extractDesiredDataFromPersonString(encoded, PERSON_DATA_PREFIX_DOB, indexOfDobPrefix, indexOfPhonePrefix, indexOfEmailPrefix);
     }
 
     /**
