@@ -127,6 +127,13 @@ public class AddressBook {
     private static final String COMMAND_CLEAR_DESC = "Clears address book permanently.";
     private static final String COMMAND_CLEAR_EXAMPLE = COMMAND_CLEAR_WORD;
 
+    private static final String COMMAND_EDIT_WORD = "edit";
+    private static final String COMMAND_EDIT_DESC = "edits a person indentified by the index numbed used in the " +
+            "last find/list call. Accepts more than one change in data";
+    private static final String COMMAND_EDIT_PARAMETER = "PHONE || EMAIL || DATE_OF_BIRTH";
+    private static final String COMMAND_EDIT_EXAMPLE = COMMAND_EDIT_WORD + " 1 p/82288601";
+    private static final String MESSAGE_EDIT_PERSON_SUCCESS = "Edited Person: %1$s";
+
     private static final String COMMAND_HELP_WORD = "help";
     private static final String COMMAND_HELP_DESC = "Shows program usage instructions.";
     private static final String COMMAND_HELP_EXAMPLE = COMMAND_HELP_WORD;
@@ -400,6 +407,8 @@ public class AddressBook {
                 return executeSortAndListAllPersonsInAddressBook();
             case COMMAND_DELETE_WORD:
                 return executeDeletePerson(commandArgs);
+            case COMMAND_EDIT_WORD:
+                return executeEditPerson(commandArgs);
             case COMMAND_CLEAR_WORD:
                 return executeClearAddressBook();
             case COMMAND_HELP_WORD:
@@ -557,6 +566,109 @@ public class AddressBook {
     }
 
     /**
+     * Edit person identified using last index displayed
+     *
+     * @param commandArgs contains last index displayed and data user wishes to edit
+     * @return feedback display message for the operation result
+     */
+
+    private static String executeEditPerson(String commandArgs){
+
+        int targetVisibleIndex = extractTargetIndexFromEditPersonArgs(commandArgs);
+        
+        if (targetVisibleIndex == -1){
+            return getMessageForInvalidCommandInput(COMMAND_EDIT_WORD, getUsageInfoForEditCommand());
+        }
+        
+        if (!isDisplayIndexValidForLastPersonListingView(targetVisibleIndex)) {
+            return MESSAGE_INVALID_PERSON_DISPLAYED_INDEX;
+        }
+ 
+        final HashMap<PersonProperty,String> personToEdit = getPersonByLastVisibleIndex(targetVisibleIndex);
+        final HashMap<PersonProperty,String> editedPerson = createNewPersonFromEditPersonArgs(commandArgs, personToEdit);
+        
+        if(!isPersonDataValid(editedPerson)){
+            return getMessageForInvalidCommandInput(COMMAND_EDIT_WORD, getUsageInfoForEditCommand());
+        }
+        
+        latestPersonListingView.set(targetVisibleIndex - 1, editedPerson);
+        ALL_PERSONS.set(ALL_PERSONS.indexOf(personToEdit), editedPerson);
+        savePersonsToFile(getAllPersonsInAddressBook(), storageFilePath);
+        return getMessageForSuccessfulEdit(editedPerson); 
+       
+    }
+
+    /**
+     * Creates a new person given new data and the original person
+     *
+     * @param commandArgs contains last index displayed and data user wishes to edit
+     * @param originalPerson original person user wishes to edit
+     * @return a new person object with updated data
+     */
+    
+    private static HashMap<PersonProperty,String> createNewPersonFromEditPersonArgs(String commandArgs, HashMap<PersonProperty,String> originalPerson){
+        String phone = extractPhoneFromEditCommandArgs(commandArgs, originalPerson);
+        String email = extractEmailFromEditCommandArgs(commandArgs, originalPerson);
+        String dob = extractDobFromEditCommandArgs(commandArgs, originalPerson);
+
+        return makePersonFromData(getNameFromPerson(originalPerson), phone, email, dob);
+    }
+
+    /**
+     * Creates a new person given new data and the original person
+     *
+     * @param commandArgs contains last index displayed and data user wishes to edit
+     * @param DATA_PREFIX prefix of data to extract
+     * @param desiredDataPrefixIndex index of prefix of desired data
+     * @param indexesOfPrefixData indexes of other prefix data
+     * @return data string without prefix
+     */
+    
+    private static String extractDataFromEditCommandArgs(String commandArgs, String DATA_PREFIX, int desiredDataPrefixIndex, int... indexesOfPrefixData){
+        int finalIndexOfSubstring = commandArgs.length();
+        for(int index : indexesOfPrefixData) {
+            if(index != -1 && index > desiredDataPrefixIndex && index < finalIndexOfSubstring) {
+                finalIndexOfSubstring = index;
+            }
+        }
+        return removePrefixSign(commandArgs.substring(desiredDataPrefixIndex, finalIndexOfSubstring).trim(), DATA_PREFIX);
+        
+    }
+    
+    private static String extractPhoneFromEditCommandArgs(String commandArgs, HashMap<PersonProperty,String> originalPerson) {
+        final int indexOfPhonePrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_PHONE);
+        final int indexOfEmailPrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_EMAIL);
+        final int indexOfDobPrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_DOB);
+        if(indexOfPhonePrefix == -1) {
+            return getPhoneFromPerson(originalPerson);
+        }
+        
+        return extractDataFromEditCommandArgs(commandArgs, PERSON_DATA_PREFIX_PHONE, indexOfPhonePrefix, indexOfEmailPrefix, indexOfDobPrefix);
+    }
+
+    private static String extractEmailFromEditCommandArgs(String commandArgs, HashMap<PersonProperty,String> originalPerson) {
+        final int indexOfPhonePrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_PHONE);
+        final int indexOfEmailPrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_EMAIL);
+        final int indexOfDobPrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_DOB);
+        if(indexOfEmailPrefix == -1) {
+            return getEmailFromPerson(originalPerson);
+        }
+
+        return extractDataFromEditCommandArgs(commandArgs, PERSON_DATA_PREFIX_EMAIL, indexOfEmailPrefix, indexOfPhonePrefix, indexOfDobPrefix);
+    }
+
+    private static String extractDobFromEditCommandArgs(String commandArgs, HashMap<PersonProperty,String> originalPerson) {
+        final int indexOfPhonePrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_PHONE);
+        final int indexOfEmailPrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_EMAIL);
+        final int indexOfDobPrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_DOB);
+        if(indexOfDobPrefix == -1) {
+            return getDobFromPerson(originalPerson);
+        }
+
+        return extractDataFromEditCommandArgs(commandArgs, PERSON_DATA_PREFIX_DOB, indexOfDobPrefix, indexOfPhonePrefix, indexOfEmailPrefix);
+    }
+    
+    /**
      * Extracts the target's index from the raw delete person args string
      *
      * @param rawArgs raw command args string for the delete person command
@@ -564,6 +676,37 @@ public class AddressBook {
      */
     private static int extractTargetIndexFromDeletePersonArgs(String rawArgs) {
         return Integer.parseInt(rawArgs.trim());
+    }
+
+    /**
+     * Extracts the target's index from the edit person args string
+     *
+     * @param commandArgs command args string for the edit person command
+     * @return extracted index
+     */
+
+    private static int extractTargetIndexFromEditPersonArgs(String commandArgs) {
+        try {
+            ArrayList<Integer> indexesOfData = new ArrayList<>();
+            indexesOfData.add(commandArgs.indexOf(PERSON_DATA_PREFIX_PHONE));
+            indexesOfData.add(commandArgs.indexOf(PERSON_DATA_PREFIX_EMAIL));
+            indexesOfData.add(commandArgs.indexOf(PERSON_DATA_PREFIX_DOB));
+            Collections.sort(indexesOfData);
+            int indexOfFirstPrefix = -1;
+            for(int index : indexesOfData){
+                if(index != -1){
+                    indexOfFirstPrefix = index;
+                    break;
+                }
+            }
+
+            if(indexOfFirstPrefix == -1){
+                return -1;
+            }
+            return Integer.parseInt(commandArgs.substring(0, indexOfFirstPrefix).trim());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     /**
@@ -585,6 +728,18 @@ public class AddressBook {
      */
     private static String getMessageForSuccessfulDelete(HashMap<PersonProperty,String> deletedPerson) {
         return String.format(MESSAGE_DELETE_PERSON_SUCCESS, getMessageForFormattedPersonData(deletedPerson));
+    }
+
+    /**
+     * Constructs a feedback message for a successful edit person command execution.
+     *
+     * @see #executeEditPerson(String)
+     * @param editedPerson successfully edited
+     * @return successful edit person feedback message
+     */
+
+    private static String getMessageForSuccessfulEdit(HashMap<PersonProperty,String> editedPerson){
+        return String.format(MESSAGE_EDIT_PERSON_SUCCESS, getMessageForFormattedPersonData(editedPerson));
     }
 
     /**
@@ -1025,8 +1180,8 @@ public class AddressBook {
      *
      * @param encoded person string representation
      * @param DATA_PREFIX prefix of data
-     * @param indexOfDesiredData index of the start of desired data
-     * @param indexesOfData variable argument of all the indexes of the different data of person
+     * @param indexOfDesiredDataPrefix index of the start of desired data
+     * @param indexesOfDataPrefix variable argument of all the indexes of the different data of person
      * @return person's data
      */
     
@@ -1057,6 +1212,7 @@ public class AddressBook {
         int indexOfFirstPrefix = Math.min(Math.min(indexOfEmailPrefix, indexOfPhonePrefix), indexOfDobPrefix);
         return encoded.substring(0, indexOfFirstPrefix).trim();
     }
+    
 
     /**
      * Extracts substring representing phone number from person string representation
@@ -1213,6 +1369,12 @@ public class AddressBook {
         return String.format(MESSAGE_COMMAND_HELP, COMMAND_DELETE_WORD, COMMAND_DELETE_DESC) + LS
                 + String.format(MESSAGE_COMMAND_HELP_PARAMETERS, COMMAND_DELETE_PARAMETER) + LS
                 + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_DELETE_EXAMPLE) + LS;
+    }
+    
+    private static String getUsageInfoForEditCommand(){
+        return String.format(MESSAGE_COMMAND_HELP, COMMAND_EDIT_WORD, COMMAND_EDIT_DESC) + LS
+                + String.format(MESSAGE_COMMAND_HELP_PARAMETERS, COMMAND_EDIT_PARAMETER) + LS
+                + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_EDIT_EXAMPLE) + LS;
     }
 
     /** Returns string for showing 'clear' command usage instruction */
