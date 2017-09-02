@@ -65,7 +65,7 @@ Format: `help`
 #### Adding a person: `add`
 > Adds a person to the address book
 
-Format: `add NAME p/PHONE_NUMBER e/EMAIL`  
+Format: `add NAME p/PHONE_NUMBER e/EMAIL dob/DATE_OF_BIRTH`  
 > Words in `UPPER_CASE` are the parameters<br>
   Phone number and email can be in any order but the name must come first.
 
@@ -75,10 +75,16 @@ Examples:
 
 #### Listing all persons: `list`
 
+> Shows a list of persons, as an indexed list, in alphabetical order
+
+Format: `sort`  
+
+#### Listing all persons: `sort`
+
 > Shows a list of persons, as an indexed list, in the order they were added to the address book, 
 oldest first.
 
-Format: `list`  
+Format: `list`
 
 #### Finding a person by keyword `find`
 > Finds persons that match given keywords
