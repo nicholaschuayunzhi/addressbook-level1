@@ -128,7 +128,7 @@ public class AddressBook {
     private static final String COMMAND_CLEAR_EXAMPLE = COMMAND_CLEAR_WORD;
 
     private static final String COMMAND_EDIT_WORD = "edit";
-    private static final String COMMAND_EDIT_DESC = "edits a person indentified by the index numbed used in the " +
+    private static final String COMMAND_EDIT_DESC = "edits a person identified by the index numbed used in the " +
             "last find/list call. Accepts more than one change in data";
     private static final String COMMAND_EDIT_PARAMETER = "p/PHONE || e/EMAIL || dob/DATE_OF_BIRTH";
     private static final String COMMAND_EDIT_EXAMPLE = COMMAND_EDIT_WORD + " 1 p/82288601";
