@@ -103,6 +103,22 @@
   list
 
 ##########################################################
+# test delete person command
+##########################################################
+
+# last active view: [1] betsy [2] esther [3] dickson
+
+edit 1 dob/11-11-1994 p/6234323
+list
+
+# test invalid index
+edit 4 e/wrong@index.com
+
+#test invalid parameters
+edit 3 e/wrongEmail.com
+
+
+##########################################################
 # test clear command
 ##########################################################
 

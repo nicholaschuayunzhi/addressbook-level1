@@ -316,6 +316,26 @@
 || 
 || 3 persons found!
 || ===================================================
+|| Enter command: || [Command entered:edit 1 dob/11-11-1994 p/6234323]
+|| Edited Person: Betsy Choo  Phone Number: 6234323  Email: benchoo@nus.edu.sg  Date Of Birth: 11-11-1994
+|| ===================================================
+|| Enter command: || [Command entered:list]
+|| 	1. Betsy Choo  Phone Number: 6234323  Email: benchoo@nus.edu.sg  Date Of Birth: 11-11-1994
+|| 	2. Esther Potato  Phone Number: 555555  Email: esther@notreal.potato  Date Of Birth: 24-01-1999
+|| 	3. Dickson Ee  Phone Number: 444444  Email: dickson@nus.edu.sg  Date Of Birth: 14-10-1992
+|| 
+|| 3 persons found!
+|| ===================================================
+|| Enter command: || [Command entered:edit 4 e/wrong@index.com]
+|| The person index provided is invalid
+|| ===================================================
+|| Enter command: || [Command entered:edit 3 e/wrongEmail.com]
+|| Invalid command format: edit 
+|| edit: edits a person identified by the index numbed used in the last find/list call. Accepts more than one change in data
+|| 	Parameters: p/PHONE || e/EMAIL || dob/DATE_OF_BIRTH
+|| 	Example: edit 1 p/82288601
+|| 
+|| ===================================================
 || Enter command: || [Command entered:  clear]
 || Address book has been cleared!
 || ===================================================
