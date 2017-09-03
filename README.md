@@ -115,6 +115,21 @@ Examples:
   `delete 1`
   > Deletes the 1st person in the results of the `find` command.
 
+* `sort` <br> 
+  `delete 1`
+  > Deletes the 1st person in the results of the `sort` command.
+
+#### Editing a person: `edit`
+
+Format: `edit INDEX p/PHONE_NUMBER || e/EMAIL || dob/DATE_OF_BIRTH`  
+> Edits the person at the specified `INDEX` with changes to phone, email and dob. 
+  The index refers to the index numbers shown in the most recent listing.
+  Data that is kept the same can be omitted.
+  
+* `list`<br>
+  `edit 2 dob/15-09-1993 p/62353535`
+   > Edit's 2nd person's (in the address book) date of birth and phone number.
+
 #### Clearing all entries: `clear`
 > Clears all entries from the address book.  
 Format: `clear`  
