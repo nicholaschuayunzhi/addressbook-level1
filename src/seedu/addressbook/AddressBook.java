@@ -566,7 +566,7 @@ public class AddressBook {
     }
 
     /**
-     * Edit person identified using last index displayed
+     * Edits person identified using last index displayed
      *
      * @param commandArgs contains last index displayed and data user wishes to edit
      * @return feedback display message for the operation result
@@ -600,6 +600,7 @@ public class AddressBook {
 
     /**
      * Creates a new person given new data and the original person
+     * If data (p, e, dob) is not provided, new person retains original person's data
      *
      * @param commandArgs contains last index displayed and data user wishes to edit
      * @param originalPerson original person user wishes to edit
@@ -615,7 +616,7 @@ public class AddressBook {
     }
 
     /**
-     * Creates a new person given new data and the original person
+     * Extracts desired data from command args
      *
      * @param commandArgs contains last index displayed and data user wishes to edit
      * @param DATA_PREFIX prefix of data to extract
@@ -634,6 +635,14 @@ public class AddressBook {
         return removePrefixSign(commandArgs.substring(desiredDataPrefixIndex, finalIndexOfSubstring).trim(), DATA_PREFIX);
         
     }
+
+    /**
+     * Extracts phone data from command args. If phone data is not phone, return original person's phone number
+     *
+     * @param commandArgs contains last index displayed and data user wishes to edit
+     * @param originalPerson original person to be edited
+     * @return phone data without prefix
+     */
     
     private static String extractPhoneFromEditCommandArgs(String commandArgs, HashMap<PersonProperty,String> originalPerson) {
         final int indexOfPhonePrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_PHONE);
@@ -646,6 +655,14 @@ public class AddressBook {
         return extractDataFromEditCommandArgs(commandArgs, PERSON_DATA_PREFIX_PHONE, indexOfPhonePrefix, indexOfEmailPrefix, indexOfDobPrefix);
     }
 
+    /**
+     * Extracts email data from command args. If phone data is not phone, return original person's email
+     *
+     * @param commandArgs contains last index displayed and data user wishes to edit
+     * @param originalPerson original person to be edited
+     * @return email data without prefix
+     */
+
     private static String extractEmailFromEditCommandArgs(String commandArgs, HashMap<PersonProperty,String> originalPerson) {
         final int indexOfPhonePrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_PHONE);
         final int indexOfEmailPrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_EMAIL);
@@ -657,6 +674,14 @@ public class AddressBook {
         return extractDataFromEditCommandArgs(commandArgs, PERSON_DATA_PREFIX_EMAIL, indexOfEmailPrefix, indexOfPhonePrefix, indexOfDobPrefix);
     }
 
+    /**
+     * Extracts dob data from command args. If phone data is not phone, return original person's dob
+     *
+     * @param commandArgs contains last index displayed and data user wishes to edit
+     * @param originalPerson original person to be edited
+     * @return dob data without prefix
+     */
+    
     private static String extractDobFromEditCommandArgs(String commandArgs, HashMap<PersonProperty,String> originalPerson) {
         final int indexOfPhonePrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_PHONE);
         final int indexOfEmailPrefix = commandArgs.indexOf(PERSON_DATA_PREFIX_EMAIL);
